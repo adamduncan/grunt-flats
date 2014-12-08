@@ -13,15 +13,21 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
 
+    // grunt-contrib-clean
+    // Remove generated templates from destination folder
+    // Be sure not to remove master template if saved in base directory
     clean: {
-      build: '_templates/*.html'
+      build: ['<%= flats.build.destPath %>/*.html', '!<%= flats.build.basePath %>/<%= flats.build.masterSrc %>']
     },
 
+    // grunt-flats
     flats: {
-      options: {
+      build: {
         basePath: '_templates',
-        src: '_layouts',
-        master: '_master/master.html'
+        layoutPath: 'layouts',
+        partialPath: 'partials',
+        masterSrc: '_master.html',
+        destPath: '_templates'
       }
     }
 
