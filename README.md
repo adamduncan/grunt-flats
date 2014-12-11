@@ -1,3 +1,4 @@
+
 # grunt-flats
 
 > Grunt task for generating static pages from templated partials.
@@ -67,6 +68,7 @@ Type: `String`
 Default value: `'_templates'`
 
 Directory where individual layouts are compiled to, same as `basePath` by default
+*Note:* Grunt-flats includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory (excluding `masterSrc`, should you keep that in the `basePath` directory).
 
 ## File structure
 
