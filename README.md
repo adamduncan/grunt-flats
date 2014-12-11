@@ -27,48 +27,51 @@ In your project's Gruntfile, add a section named `flats` to the data object pass
 grunt.initConfig({
   flats: {
     build: {
-      basePath: '_templates',
-      layoutPath: 'layouts',
-      partialPath: 'partials',
-      masterSrc: 'masterpage/master.html',
-      destPath: '_templates'
-    },
-  },
+      options: {
+        basePath: '_templates',
+        layoutPath: 'layouts',
+        partialPath: 'partials',
+        masterSrc: 'masterpage/master.html',
+        destPath: '_templates'
+      }
+    }
+  }
 });
 ```
 
 ### Options
 
-#### build.basePath
+#### options.basePath
 Type: `String`
 Default value: `'_templates'`
 
 Working path for all templating, relative to root
 
-#### build.layoutPath
+#### options.layoutPath
 Type: `String`
 Default value: `'layouts'`
 
 Directory where individual layouts are kept, relative to `basePath`
 
-#### build.partialPath
+#### options.partialPath
 Type: `String`
 Default value: `'partials'`
 
 Directory where individual partials are kept, relative to `basePath`
 
-#### build.masterSrc
+#### options.masterSrc
 Type: `String`
 Default value: `'masterpage/master.html'`
 
 Path to masterpage, relative to `basePath`
 
-#### build.destPath
+#### options.destPath
 Type: `String`
 Default value: `'_templates'`
 
 Directory where individual layouts are compiled to, same as `basePath` by default
-*Note:* Grunt-flats includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory (excluding `masterSrc`, should you keep that in the `basePath` directory).
+
+*Note:* Grunt-flats includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory on build (excluding `masterSrc`, should you want to keep that in the `basePath` directory).
 
 ## File structure
 
@@ -98,7 +101,7 @@ The master should contain all of your site-wide template markup. It contains a s
 
 Grunt-flats uses [Hogan.js](http://twitter.github.io/hogan.js/) under the hood. It's built against [Mustache](http://mustache.github.io/mustache.5.html)'s test suite, so you can easily port your existing Mustache or Handlebars templates and retain the same partial syntax.
 
-To include a partial, reference it using an extensionless path. This should be relative to the `build.partialPath` directory. E.g.
+To include a partial, reference it using an extensionless path. This should be relative to the `options.partialPath` directory. E.g.
 
 ```
 {{>components/header}}

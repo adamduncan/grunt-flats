@@ -23,11 +23,13 @@ module.exports = function(grunt) {
     // grunt-flats
     flats: {
       build: {
-        basePath: '_templates',
-        layoutPath: 'layouts',
-        partialPath: 'partials',
-        masterSrc: 'masterpage/master.html',
-        destPath: '_templates'
+        options: {
+          basePath: '_templates',
+          layoutPath: 'layouts',
+          partialPath: 'partials',
+          masterSrc: 'masterpage/master.html',
+          destPath: '_templates'
+        }
       }
     }
 
