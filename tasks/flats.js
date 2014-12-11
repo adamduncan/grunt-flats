@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 			// Recurse through layouts directory
 			grunt.file.recurse(path, function (absPath, rootDir, subDir, filename) {
 
-			// Read layout source and test for {{>  }} partial string
+			// Read layout source
 				var layoutSource = grunt.file.read(absPath);
 
 				// Add record to global layouts object
@@ -109,7 +109,7 @@ module.exports = function(grunt) {
 
 			// Pull layout into master content placeholder partial
 			layouts.content = layout;
-			
+
 			// Render final layout
 			layout = master.render({}, layouts);
 			

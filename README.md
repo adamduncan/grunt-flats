@@ -25,11 +25,12 @@ In your project's Gruntfile, add a section named `flats` to the data object pass
 ```js
 grunt.initConfig({
   flats: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
+    build: {
+      basePath: '_templates',
+      layoutPath: 'layouts',
+      partialPath: 'partials',
+      masterSrc: 'masterpage/master.html',
+      destPath: '_templates'
     },
   },
 });
@@ -37,53 +38,78 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
+#### build.basePath
 Type: `String`
-Default value: `',  '`
+Default value: `'_templates'`
 
-A string value that is used to do something with whatever.
+Working path for all templating, relative to root
 
-#### options.punctuation
+#### build.layoutPath
 Type: `String`
-Default value: `'.'`
+Default value: `'layouts'`
 
-A string value that is used to do something else with whatever else.
+Directory where individual layouts are kept, relative to `basePath`
 
-### Usage Examples
+#### build.partialPath
+Type: `String`
+Default value: `'partials'`
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+Directory where individual partials are kept, relative to `basePath`
 
-```js
-grunt.initConfig({
-  flats: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+#### build.masterSrc
+Type: `String`
+Default value: `'masterpage/master.html'`
+
+Path to masterpage, relative to `basePath`
+
+#### build.destPath
+Type: `String`
+Default value: `'_templates'`
+
+Directory where individual layouts are compiled to, same as `basePath` by default
+
+## File structure
+
+Grunt-flats attempts to be as flexible as possible. The file structure based off the tasks' default options would follow:
+
+```
+_templates/
+  masterpage/
+    master.html
+  layouts/
+    _individual layout templates_
+  partials/
+    _partials and/or user-defined subdirectories_
+
+_compiled templates_
 ```
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+However, each of these directories and paths are configurable to match your existing workflow. If you're a fan of Pattern Lab's [Atomic Design Patterns](http://patternlab.io/docs/pattern-organization.html) or Lonely Planet's [Rizzo Styleguide](http://rizzo.lonelyplanet.com/styleguide) you can folderize your partials accordingly.
 
-```js
-grunt.initConfig({
-  flats: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
+### Master page
+
+_See: [/_templates/masterpage/master.html](https://github.com/adamduncan/grunt-flats/blob/master/_templates/masterpage/master.html)_
+
+The master should contain all of your site-wide template markup. It contains a single `{{>content}}` partial to act as a placeholder; this is where each individual layout's markup will be rendered.
+
+## Partials/include pattern
+
+Grunt-flats uses [Hogan.js](http://twitter.github.io/hogan.js/) under the hood. It's built against [Mustache](http://mustache.github.io/mustache.5.html)'s test suite, so you can easily port your existing Mustache or Handlebars templates and retain the same partial syntax.
+
+To include a partial, reference it using an extensionless path. This should be relative to the `build.partialPath` directory. E.g.
+
 ```
+{{>components/header}}
+```
+
+Partials are constructed recursively, so can be infinitely nestable.
+
+_Version 0.3.0 will include a method for passing in a partial-specific data object to render dynamic values. This will be documented as released._
+
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
+- v0.1.0 Initial setup, non-recursive partial rendering
+- v0.2.0 Rewrite to support infinitely nestable partial rendering

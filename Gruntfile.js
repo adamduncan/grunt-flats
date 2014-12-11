@@ -26,7 +26,7 @@ module.exports = function(grunt) {
         basePath: '_templates',
         layoutPath: 'layouts',
         partialPath: 'partials',
-        masterSrc: '_master.html',
+        masterSrc: 'masterpage/master.html',
         destPath: '_templates'
       }
     }
