@@ -12,83 +12,119 @@ module.exports = function(grunt) {
 
 	// External dependencies
 	var fs = require('fs'),
-			hogan = require('hogan.js');
+		hogan = require('hogan.js');
 
 	// Register task
 	grunt.registerMultiTask('flats', 'Grunt task for generating static layouts from templated partials.', function() {
 
 		// Merge options with defaults
 		var options = this.options({
-				basePath: '_templates',
-				layoutPath: 'layouts',
-				partialPath: 'partials',
-				masterSrc: 'masterpage/master.html',
-				destPath: '_templates'
+			basePath: '_templates',
+			layoutPath: 'layouts',
+			partialPath: 'partials',
+			masterSrc: 'masterpage/master.html',
+			destPath: '_templates'
 		});
 
 
 		// Store masterpage and compiled masterpage
 		var masterPath = options.basePath + '/' + options.masterSrc,
-				masterSource = grunt.file.read(masterPath),
-				master = hogan.compile(masterSource, { sectionTags: [{o:'_i', c:'i'}] });
+			masterSource = grunt.file.read(masterPath),
+			master = hogan.compile(masterSource, { sectionTags: [{o:'_i', c:'i'}] });
 
-		// Store partial and layout paths
+		// Store partial, layout paths and global layouts object
 		var partialPath = options.basePath + '/' + options.partialPath,
-				layoutPath = options.basePath + '/' + options.layoutPath;
+			layoutPath = options.basePath + '/' + options.layoutPath,
+			layouts = {};
 
 
-		// Partial/layout generator function
-		var generate = function (path, partials) {
-
-			// Store layouts object
-			var layouts = {};
-
-			// Loop through partials/layouts recursively
-			grunt.file.recurse(path, function (absPath, rootDir, subDir, filename) {
+		var layoutLoop = function (path) {
 			
-				var layoutSource = grunt.file.read(absPath),
-						layout = hogan.compile(layoutSource);
+			// Recurse through layouts directory
+			grunt.file.recurse(path, function (absPath, rootDir, subDir, filename) {
 
-				// Create extensionless partial path
-				var relPath  = absPath.substr(rootDir.length + 1),
-						layoutName = relPath.substr(0, relPath.lastIndexOf('.'));
+			// Read layout source and test for {{>  }} partial string
+				var layoutSource = grunt.file.read(absPath);
+
+				// Add record to global layouts object
+				layouts[filename] = layoutSource;
+
+				// Make call to kick off partial recursion
+				partialLoop(absPath, filename);
+			
+			});
+		
+		};
+
+		var partialLoop = function(absPath, filename) {
+
+				// Store partials and bool
+				var partialSource = grunt.file.read(absPath),
+					partials = partialSource.match(/{{>.*}}/g),
+					containsPartial = !!(partials);
+
+				// Check if layout contains more partials
+				if (!containsPartial) {
+					// No? Exit early
+					return;
+				} else {
+					// Yes? Make call to process partials recursively
+					partialWrite(partials, filename);
+				}
+
+		};
+
+		var partialWrite = function (partials, filename) {
+
+			// Loop through each partial found
+			each(partials, function(partial) {
 				
+				// Store partial paths and source
+				// Use grunt.expand method, passing partial path, with extension wildcard, pattern
+				var partialRelPath = partial.split('{{>')[1].split('}}')[0].trim(),
+					partialAbsPath = grunt.file.expand(partialPath + '/' + partialRelPath + '.*'),
+					partialSource = grunt.file.read(partialAbsPath);
 
-				//
-				// TO-DO: Check for partial-specific data
-				//
+				// Render partial by replacing in source
+				var newSource = layouts[filename].replace(partial, partialSource);
 
-				// Add rendered layout to layouts object
-				layouts[layoutName] = layout.render({}, partials);
+				// Update value in global layouts object
+				layouts[filename] = newSource;
 
-				//grunt.log.writeln(tempSrc);
-				grunt.log.writeln(JSON.stringify(layouts));
+				// Recurse, passing nested partials and layout filename
+				partialLoop(partialAbsPath, filename);
 
 			});
 
-			return layouts;
 
 		};
 
 
-		// Log start
-		//grunt.log.writeln('\nGenerating layouts:');
+		// Call to loop over layouts
+		layoutLoop(layoutPath);
+		grunt.log.writeln('\nGenerating layouts:');
 
-		// Generate layouts
-		var partials = generate(partialPath),
-				layouts = generate(layoutPath, partials);
-
-		// Loop over each layout and render/write file
+		// Generate all layouts once layouts global object compiled
 		each(layouts, function (layout, name) {
-			partials.content = layout;
+
+			// Pull layout into master content placeholder partial
+			layouts.content = layout;
+			
 			// Render final layout
-			layout = master.render({}, partials);
+			layout = master.render({}, layouts);
+			
+			// Change layout extension to html
+			name.replace(name.substring(name.lastIndexOf('.')), '.html');
+			
 			// Write file to working directory
-			var layoutSrc = options.destPath  + '/' + name + '.html';
+			var layoutSrc = options.destPath  + '/' + name;
 			grunt.file.write(layoutSrc, layout);
-			// Log success
-			//grunt.log.writeln(layoutSrc);
+			
+			// Log each template successfully rendered/written
+			grunt.log.writeln(layoutSrc);
+		
 		});
+
 
 
 		// Each helper

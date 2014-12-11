@@ -6,8 +6,18 @@
   "author": {
     "name": "Adam Duncan",
     "email": "mail@adamduncandesigns.com",
-    "url": "http://www.adamduncandesigns.com"
+    "url": "http://adamduncandesigns.com"
   },
+  "contributors": [
+    {
+      "name": "Adam Duncan",
+      "url": "http://adamduncandesigns.com"
+    },
+    {
+      "name": "Thomas Digby",
+      "url": "http://thomasdig.by"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/adamduncan/grunt-flats.git"
@@ -21,8 +31,9 @@
       "url": "https://github.com/adamduncan/grunt-flats/blob/master/LICENSE-MIT"
     }
   ],
+  "main": "Gruntfile.js",
   "engines": {
-    "node": ">= 0.8.0"
+    "node": ">= 0.10.x"
   },
   "dependencies": {
     "hogan.js": "^3.0.2"
