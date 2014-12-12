@@ -118,3 +118,4 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 ## Release History
 - v0.1.0 Initial setup, non-recursive partial rendering
 - v0.2.0 Rewrite to support infinitely nestable partial rendering
+- v0.2.1 Added error checking for incorrect/missing partials
