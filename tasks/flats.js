@@ -53,24 +53,27 @@ module.exports = function(grunt) {
 				partialLoop(absPath, filename);
 			
 			});
+
+			// Recurse function completed without failing, render layout html
+			renderLayouts();
 		
 		};
 
 		var partialLoop = function(absPath, filename) {
 
-				// Store partials and bool
-				var partialSource = grunt.file.read(absPath),
-					partials = partialSource.match(/{{>.*}}/g),
-					containsPartial = !!(partials);
+			// Store partials and bool
+			var partialSource = grunt.file.read(absPath),
+				partials = partialSource.match(/{{>.*}}/g),
+				containsPartial = !!(partials);
 
-				// Check if layout contains more partials
-				if (!containsPartial) {
-					// No? Exit early
-					return;
-				} else {
-					// Yes? Make call to process partials recursively
-					partialWrite(partials, filename);
-				}
+			// Check if layout contains more partials
+			if (!containsPartial) {
+				// No? Exit early
+				return;
+			} else {
+				// Yes? Make call to process partials recursively
+				partialWrite(partials, filename);
+			}
 
 		};
 
@@ -78,59 +81,73 @@ module.exports = function(grunt) {
 
 			// Loop through each partial found
 			each(partials, function(partial) {
-				
+
 				// Store partial paths and source
 				// Use grunt.expand method, passing partial path, with extension wildcard, pattern
 				var partialRelPath = partial.split('{{>')[1].split('}}')[0].trim(),
-					partialAbsPath = grunt.file.expand(partialPath + '/' + partialRelPath + '.*'),
-					partialSource = grunt.file.read(partialAbsPath);
+					partialAbsPath = grunt.file.expand(partialPath + '/' + partialRelPath + '.*');
 
-				// Render partial by replacing in source
-				var newSource = layouts[filename].replace(partial, partialSource);
+				// Make sure partial exists before compiling
+				if (partialAbsPath == "") {
+					// Log error and fail with warning
+					grunt.fail.warn('Cannot find ' + options.partialPath + '/' + partialRelPath + ' in ' + filename +
+									'.\nPlease ensure path/filename is correct and has no extension');
 
-				// Update value in global layouts object
-				layouts[filename] = newSource;
+				} else {
+					// Render partial by replacing in source
+					var partialSource = grunt.file.read(partialAbsPath),
+						newSource = layouts[filename].replace(partial, partialSource);
 
-				// Recurse, passing nested partials and layout filename
-				partialLoop(partialAbsPath, filename);
+					// Update value in global layouts object
+					layouts[filename] = newSource;
+
+					// Recurse, passing nested partials and layout filename
+					partialLoop(partialAbsPath, filename);
+
+				}
 
 			});
 
+		};
+
+
+		// Generate all layouts once layouts global object compiled
+		var renderLayouts = function() {
+
+			grunt.log.writeln('\nGenerating layouts:');
+
+			each(layouts, function (layout, name) {
+
+				// Pull layout into master content placeholder partial
+				layouts.content = layout;
+
+				// Render final layout
+				layout = master.render({}, layouts);
+				
+				// Change layout extension to html
+				name.replace(name.substring(name.lastIndexOf('.')), '.html');
+				
+				// Write file to working directory
+				var layoutSrc = options.destPath  + '/' + name;
+				grunt.file.write(layoutSrc, layout);
+				
+				// Log each template successfully rendered/written
+				grunt.log.ok(layoutSrc);
+			
+			});
 
 		};
 
 
 		// Call to loop over layouts
 		layoutLoop(layoutPath);
-		grunt.log.writeln('\nGenerating layouts:');
-
-		// Generate all layouts once layouts global object compiled
-		each(layouts, function (layout, name) {
-
-			// Pull layout into master content placeholder partial
-			layouts.content = layout;
-
-			// Render final layout
-			layout = master.render({}, layouts);
-			
-			// Change layout extension to html
-			name.replace(name.substring(name.lastIndexOf('.')), '.html');
-			
-			// Write file to working directory
-			var layoutSrc = options.destPath  + '/' + name;
-			grunt.file.write(layoutSrc, layout);
-			
-			// Log each template successfully rendered/written
-			grunt.log.writeln(layoutSrc);
-		
-		});
 
 
 
 		// Each helper
 		function each(obj, iter) {
 			var keys = Object.keys(obj);
-			for (var i= 0; i < keys.length; i++) {
+			for (var i = 0; i < keys.length; i++) {
 				iter.call(null, obj[keys[i]], keys[i]);
 			}
 		}
