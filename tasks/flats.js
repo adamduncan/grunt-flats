@@ -82,9 +82,24 @@ module.exports = function(grunt) {
 			// Loop through each partial found
 			each(partials, function(partial) {
 
+				// Store copy of partial string for augmentation and data regex
+				var partialString = partial,
+					partialDataReg = partialString.match(/\(.*\)/g);
+				
+				// Check if partial contains data object - ie. (...) 
+				if (partialDataReg) {
+					// Store data as string and object
+					var partialDataString = partialDataReg[0],
+						partialDataObj = JSON.parse('{' + partialDataString.substring(1, partialDataString.length - 1) + '}');
+
+					// Remove partial data from copy of partial string
+					partialString = partialString.replace(partialDataString, '');
+					
+				}
+
 				// Store partial paths and source
 				// Use grunt.expand method, passing partial path, with extension wildcard, pattern
-				var partialRelPath = partial.split('{{>')[1].split('}}')[0].trim(),
+				var partialRelPath = partialString.split('{{>')[1].split('}}')[0].trim(),
 					partialAbsPath = grunt.file.expand(partialPath + '/' + partialRelPath + '.*');
 
 				// Make sure partial exists before compiling
@@ -94,9 +109,20 @@ module.exports = function(grunt) {
 									'.\nPlease ensure path/filename is correct and has no extension');
 
 				} else {
-					// Render partial by replacing in source
+
+					// Store partial source, compiled template
 					var partialSource = grunt.file.read(partialAbsPath),
+						compilePartial = hogan.compile(partialSource),
+						newSource;						
+
+					// If data object was found earlier
+					if (partialDataObj) {
+						// Generate new source by replacing original partial with data-compiled partial render
+						newSource = layouts[filename].replace(partial, compilePartial.render(partialDataObj));
+					} else {
+						// Render partial as is by replacing in source
 						newSource = layouts[filename].replace(partial, partialSource);
+					}
 
 					// Update value in global layouts object
 					layouts[filename] = newSource;
