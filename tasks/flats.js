@@ -89,11 +89,23 @@ module.exports = function(grunt) {
 				// Check if partial contains data object - ie. (...) 
 				if (partialDataReg) {
 					// Store data as string and object
-					var partialDataString = partialDataReg[0],
-						partialDataObj = JSON.parse('{' + partialDataString.substring(1, partialDataString.length - 1) + '}');
+					var partialData = partialDataReg[0],
+						partialDataString = '{' + partialData.substring(1, partialData.length - 1) + '}';
+
+					// Ensure partial data string is valid JSON before going any further
+					try {
+						JSON.parse(partialDataString);
+					} catch (error) {
+						// If not, log error with warning
+						grunt.fail.warn('Invalid partial syntax originating from ' + filename +
+										'\n' + partial + '\n');
+					}
+
+					// Parse partial data as JSON
+					var partialDataObj = JSON.parse(partialDataString);
 
 					// Remove partial data from copy of partial string
-					partialString = partialString.replace(partialDataString, '');
+					partialString = partialString.replace(partialData, '');
 					
 				}
 
@@ -106,7 +118,7 @@ module.exports = function(grunt) {
 				if (partialAbsPath == "") {
 					// Log error and fail with warning
 					grunt.fail.warn('Cannot find ' + options.partialPath + '/' + partialRelPath + ' in ' + filename +
-									'.\nPlease ensure path/filename is correct and has no extension');
+									'.\nPlease ensure path/filename is correct and has no extension' + '\n');
 
 				} else {
 

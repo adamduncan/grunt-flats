@@ -1,7 +1,7 @@
 {
   "name": "grunt-flats",
   "description": "Grunt task for generating static layouts from templated partials.",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "homepage": "https://github.com/adamduncan/grunt-flats",
   "author": {
     "name": "Adam Duncan",
@@ -44,12 +44,17 @@
   },
   "keywords": [
     "gruntplugin",
+    "grunt",
     "template",
     "templating",
     "static",
     "html",
     "handlebars",
     "mustache",
-    "render"
+    "render",
+    "flat",
+    "flats",
+    "hogan",
+    "hoganjs"
   ]
 }

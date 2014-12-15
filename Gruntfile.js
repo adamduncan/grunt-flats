@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     // Remove generated templates from destination folder
     // Be sure not to remove master template if saved in base directory
     clean: {
-      build: ['<%= flats.build.destPath %>/*.html', '!<%= flats.build.basePath %>/<%= flats.build.masterSrc %>']
+      build: ['<%= flats.build.options.destPath %>/*.html', '!<%= flats.build.options.basePath %>/<%= flats.build.options.masterSrc %>']
     },
 
     // grunt-flats

@@ -71,25 +71,32 @@ Default value: `'_templates'`
 
 Directory where individual layouts are compiled to, same as `basePath` by default
 
-*Note:* Grunt-flats includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory on build (excluding `masterSrc`, should you want to keep that in the `basePath` directory).
+*Note:* _Grunt-flats_ includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory on build (excluding `masterSrc`, should you want to keep that in the `basePath` directory).
 
 ## File structure
 
-Grunt-flats attempts to be as flexible as possible. The file structure based off the tasks' default options would follow:
+_Grunt-flats_ attempts to be as flexible as possible. The file structure based off the tasks' default options would follow:
 
 ```
 _templates/
+  
   masterpage/
     master.html
+  
   layouts/
-    _individual layout templates_
+    (individual layout templates)
+  
   partials/
-    _partials and/or user-defined subdirectories_
+    (partials and/or user-defined sub-directories)
 
-_compiled templates_
+  (compiled templates)
 ```
 
 However, each of these directories and paths are configurable to match your existing workflow. If you're a fan of Pattern Lab's [Atomic Design Patterns](http://patternlab.io/docs/pattern-organization.html) or Lonely Planet's [Rizzo Styleguide](http://rizzo.lonelyplanet.com/styleguide) you can folderize your partials accordingly.
+
+The _grunt-flats_ Git repo contains an example `_templates` directory. This includes a master, layouts and partials to demonstrate how the plugin could be utilised.
+
+It is especially effective when wanting to produce a *living styleguide* for a site; ensuring all code snippets are maintained in a single place and any changes are automatically propogated through all templates.
 
 ### Master page
 
@@ -99,7 +106,7 @@ The master should contain all of your site-wide template markup. It contains a s
 
 ## Partials/include pattern
 
-Grunt-flats uses [Hogan.js](http://twitter.github.io/hogan.js/) under the hood. It's built against [Mustache](http://mustache.github.io/mustache.5.html)'s test suite, so you can easily port your existing Mustache or Handlebars templates and retain the same partial syntax.
+_Grunt-flats_ uses [Hogan.js](http://twitter.github.io/hogan.js/) under the hood. It's built against [Mustache](http://mustache.github.io/mustache.5.html)'s test suite, so you can easily port your existing Mustache or Handlebars templates and retain the same partial syntax.
 
 To include a partial, reference it using an extensionless path. This should be relative to the `options.partialPath` directory. E.g.
 
@@ -109,8 +116,26 @@ To include a partial, reference it using an extensionless path. This should be r
 
 Partials are constructed recursively, so can be infinitely nestable.
 
-_Version 0.3.0 will include a method for passing in a partial-specific data object to render dynamic values. This will be documented as released._
+### Partial-specific data
 
+Partial rendering can be enhanced by including a partial-specific data object. This syntax is similar to that utilised by [Pattern Lab](http://patternlab.io/docs/pattern-parameters.html):
+
+```
+{{>components/module-promo ("imgsrc": "/images/new-promo.jpg", "title": "New Module Title")}}
+```
+
+Partial data is wrapped within parenthesis `( ... )` and appended to the partial reference. Within, the data should be formatted as you would any standard JSON object. Keys and values are wrapped in double quotes, and each key/value pair separated by a single comma.
+
+### Partial default values
+
+Once a data object has been defined and passed to a partial, we can utilise these values on their own, or pair them with defaults. Use Mustache's [Inverted Sections syntax](https://github.com/janl/mustache.js/#inverted-sections) to declare a default value to use, following a standard Mustache [Variable](https://github.com/janl/mustache.js/#variables). For example, within _components/module-promo_:
+
+```html
+<img src="{{imgsrc}}{{^imgsrc}}/images/default-promo-image.jpg{{/imgsrc}}" alt="Placeholder" />
+<h2>{{title}}{{^title}}Default Module Title{{/title}}</h2>
+```
+
+This way we can define default dummy data for any partials throughout the templates, and be sure only one value will be rendered. It allows our partials to be more customisable and re-usable, in a very targetted way.  
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
