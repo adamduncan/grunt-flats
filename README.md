@@ -111,7 +111,7 @@ _Grunt-flats_ uses [Hogan.js](http://twitter.github.io/hogan.js/) under the hood
 To include a partial, reference it using an extensionless path. This should be relative to the `options.partialPath` directory. E.g.
 
 ```
-{{>components/header}}
+{{>components/module-promo}}
 ```
 
 Partials are constructed recursively, so can be infinitely nestable.
