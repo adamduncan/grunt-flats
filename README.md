@@ -71,7 +71,7 @@ Default value: `'_templates'`
 
 Directory where individual layouts are compiled to, same as `basePath` by default
 
-*Note:* _Grunt-flats_ includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory on build (excluding `masterSrc`, should you want to keep that in the `basePath` directory).
+**Note:** _Grunt-flats_ includes [grunt-contrib-clean](https://github.com/gruntjs/grunt-contrib-clean) as a dependency, and will clean all `*.html` files from this directory on build (excluding `masterSrc`, should you want to keep that in the `basePath` directory).
 
 ## File structure
 
@@ -96,7 +96,7 @@ However, each of these directories and paths are configurable to match your exis
 
 The _grunt-flats_ Git repo contains an example `_templates` directory. This includes a master, layouts and partials to demonstrate how the plugin could be utilised.
 
-It is especially effective when wanting to produce a *living styleguide* for a site; ensuring all code snippets are maintained in a single place and any changes are automatically propogated through all templates.
+It is especially effective when wanting to produce a **living styleguide** for a site; ensuring all code snippets are maintained in a single place and any changes are automatically propogated through all templates.
 
 ### Master page
 
@@ -144,3 +144,4 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 - v0.1.0 Initial setup, non-recursive partial rendering
 - v0.2.0 Rewrite to support infinitely nestable partial rendering
 - v0.2.1 Added error checking for incorrect/missing partials 
+- v0.3.0 Added partial-specific data rendering
